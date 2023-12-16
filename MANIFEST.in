@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include casino_navy *.css
+recursive-include casino_navy *.csv
+recursive-include casino_navy *.html
+recursive-include casino_navy *.ico
+recursive-include casino_navy *.js
+recursive-include casino_navy *.json
+recursive-include casino_navy *.md
+recursive-include casino_navy *.png
+recursive-include casino_navy *.py
+recursive-include casino_navy *.svg
+recursive-include casino_navy *.txt
+recursive-exclude casino_navy *.pyc
