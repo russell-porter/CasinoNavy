@@ -20,6 +20,7 @@
   "third_party_reference",
   "transaction_cb",
   "username",
+  "description",
   "amended_from"
  ],
  "fields": [
@@ -104,11 +105,16 @@
    "fieldname": "username",
    "fieldtype": "Data",
    "label": "Username"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-12 12:16:28.671403",
+ "modified": "2024-09-20 02:39:24.858514",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Transaction Ledger",
