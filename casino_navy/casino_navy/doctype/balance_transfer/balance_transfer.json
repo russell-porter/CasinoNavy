@@ -1,0 +1,196 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "autoname": "autoincrement",
+ "creation": "2024-10-08 13:08:28.127286",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parties_sb",
+  "from_company",
+  "from_supplier",
+  "from_fee",
+  "main_cb",
+  "to_company",
+  "to_supplier",
+  "to_fee",
+  "transaction_sb",
+  "amount",
+  "transaction_id",
+  "third_party_reference",
+  "transaction_cb",
+  "date",
+  "username",
+  "description",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "parties_sb",
+   "fieldtype": "Section Break",
+   "label": "Parties"
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "From Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "From Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "from_fee",
+   "fieldtype": "Currency",
+   "label": "From Fee"
+  },
+  {
+   "fieldname": "main_cb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_company",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "To Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "To Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "default": "0.00",
+   "fieldname": "to_fee",
+   "fieldtype": "Currency",
+   "label": "To Fee"
+  },
+  {
+   "fieldname": "transaction_sb",
+   "fieldtype": "Section Break",
+   "label": "Transation Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "transaction_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Transaction ID"
+  },
+  {
+   "fieldname": "third_party_reference",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Third Party Reference"
+  },
+  {
+   "fieldname": "transaction_cb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "Username"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "Description"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Transaction Ledger",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-10-09 13:03:44.868455",
+ "modified_by": "Administrator",
+ "module": "Casino Navy",
+ "name": "Balance Transfer",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "from_supplier"
+}

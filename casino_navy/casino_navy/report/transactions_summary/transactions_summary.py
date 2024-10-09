@@ -88,14 +88,14 @@ def get_columns(filters):
 				'width': 130
 			},
 			{
-				'fieldname': 'withdrawal',
-				'label': 'Withdrawal',
+				'fieldname': 'withdraw',
+				'label': 'Withdraw',
 				'fieldtype': 'Currency',
 				'width': 130
 			},
 			{
-				'fieldname': 'withdrawal_fee',
-				'label': 'Withdrawal Fee',
+				'fieldname': 'withdraw_fee',
+				'label': 'Withdraw Fee',
 				'fieldtype': 'Currency',
 				'width': 130
 			},			
@@ -118,8 +118,8 @@ def get_data(filters):
 			T.supplier,
 			fn.Sum(Case().when(T.transaction_type == 'Deposit', T.amount).else_(0)).as_('deposit'),
 			fn.Sum(Case().when(T.transaction_type == 'Deposit', T.fee).else_(0)).as_('deposit_fee'),
-			fn.Sum(Case().when(T.transaction_type == 'Withdrawal', T.amount).else_(0)).as_('withdrawal'),
-			fn.Sum(Case().when(T.transaction_type == 'Withdrawal', T.fee).else_(0)).as_('withdrawal_fee'),
+			fn.Sum(Case().when(T.transaction_type == 'Withdraw', T.amount).else_(0)).as_('withdraw'),
+			fn.Sum(Case().when(T.transaction_type == 'Withdraw', T.fee).else_(0)).as_('withdraw_fee'),
 			fn.Sum(Case().when(T.transaction_type == 'Deposit', T.amount).else_(-T.amount) ).as_('balance'),
 		).where(Criterion.all(conditions)).groupby(T.supplier).orderby(T.supplier).run(as_dict=True)
 	else:
@@ -129,6 +129,6 @@ def get_data(filters):
 			T.transaction_type,
 			Case().when(T.transaction_type == 'Deposit', T.amount).else_(0).as_('deposit'),
 			Case().when(T.transaction_type == 'Deposit', T.fee).else_(0).as_('deposit_fee'),
-			Case().when(T.transaction_type == 'Withdrawal', T.amount).else_(0).as_('withdrawal'),
-			Case().when(T.transaction_type == 'Withdrawal', T.fee).else_(0).as_('withdrawal_fee'),
+			Case().when(T.transaction_type == 'Withdraw', T.amount).else_(0).as_('withdraw'),
+			Case().when(T.transaction_type == 'Withdraw', T.fee).else_(0).as_('withdraw_fee'),
 		).where(Criterion.all(conditions)).orderby(T.date).run(as_dict=True)

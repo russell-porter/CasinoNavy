@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"bOmK0dsYtI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Casino Navy</span>\",\"col\":12}},{\"id\":\"FJExpYrUWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":3}},{\"id\":\"mo8j1l8fpJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transaction Ledger\",\"col\":3}},{\"id\":\"z2Wi9wRtg2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"xU0Z8P7HEf\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "content": "[{\"id\":\"bOmK0dsYtI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Casino Navy</span>\",\"col\":12}},{\"id\":\"FJExpYrUWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":3}},{\"id\":\"mo8j1l8fpJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transaction Ledger\",\"col\":3}},{\"id\":\"Dldfdr88qz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Balance Transfer\",\"col\":3}},{\"id\":\"z2Wi9wRtg2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"xU0Z8P7HEf\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
  "creation": "2024-09-12 01:05:30.739849",
  "custom_blocks": [],
  "docstatus": 0,
@@ -31,7 +31,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-09-25 16:41:25.246648",
+ "modified": "2024-10-09 12:53:19.303443",
  "modified_by": "lewinvillar@tzcode.tech",
  "module": "Casino Navy",
  "name": "Casino Navy",
@@ -43,6 +43,14 @@
  "roles": [],
  "sequence_id": 2.0,
  "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Balance Transfer",
+   "link_to": "Balance Transfer",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
   {
    "color": "Green",
    "doc_view": "List",
