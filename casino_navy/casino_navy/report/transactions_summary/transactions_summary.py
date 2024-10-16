@@ -35,13 +35,13 @@ def get_columns(filters):
 				'width': 140
 			},
 			{
-				'fieldname': 'withdrawal',
-				'label': 'Withdrawal',
+				'fieldname': 'withdraw',
+				'label': 'Withdraw',
 				'fieldtype': 'Currency',
 				'width': 140
 			},
 			{
-				'fieldname': 'withdrawal_fee',
+				'fieldname': 'withdraw_fee',
 				'label': 'Withdrawal Fee',
 				'fieldtype': 'Currency',
 				'width': 140
