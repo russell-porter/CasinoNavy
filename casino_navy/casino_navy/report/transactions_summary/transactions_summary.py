@@ -58,6 +58,12 @@ def get_columns(filters):
 	else:
 		columns = [
 			{
+				'fieldname': 'name',
+				'label': 'Document',
+				'fieldtype': 'Data',
+				'width': 180
+			},
+			{
 				'fieldname': 'supplier',
 				'label': 'Supplier',
 				'fieldtype': 'Link',
@@ -129,35 +135,39 @@ def get_data(filters):
 	if filters.get('summary'):
 		# Deposits and Withdrawals
 		dep_with = Query.from_(T).select(
+			T.name,
 			T.supplier,
 			(Case().when(T.transaction_type == 'Deposit', T.amount).else_(0)).as_('deposit'),
 			(Case().when(T.transaction_type == 'Deposit', T.fee).else_(0)).as_('deposit_fee'),
 			(Case().when(T.transaction_type == 'Withdraw', T.amount).else_(0)).as_('withdraw'),
 			(Case().when(T.transaction_type == 'Withdraw', T.fee).else_(0)).as_('withdraw_fee'),
-			(Case().when(T.transaction_type == 'Deposit', T.amount).else_(-T.amount) ).as_('balance'),
+			(Case().when(T.transaction_type == 'Deposit', T.amount - T.fee).else_(-T.amount - T.fee) ).as_('balance'),
 		).where(Criterion.all(conditions)).orderby(T.supplier)
 		# Transfers In
 		transfers_in = Query.from_(BT).select(
+			BT.name,
 			BT.to_supplier.as_('supplier'),
 			(BT.amount).as_('deposit'),
 			(BT.to_fee).as_('deposit_fee'),
 			(BT.docstatus).as_('withdraw'),
 			(BT.docstatus).as_('withdraw_fee'),
-			(BT.amount).as_('balance')
+			(BT.amount - BT.to_fee).as_('balance')
 		).where(Criterion.all(trax_in_conditions))
 		# Transfers Out
 		transfers_out = Query.from_(BT).select(
+			BT.name,
 			BT.from_supplier.as_('supplier'),
 			(BT.docstatus).as_('deposit'),
 			(BT.docstatus).as_('deposit_fee'),
 			(BT.amount).as_('withdraw'),
 			(BT.from_fee).as_('withdraw_fee'),
-			(-BT.amount).as_('balance')
+			(-BT.amount - BT.from_fee).as_('balance')
 		).where(Criterion.all(trax_out_conditions))
 
 		query = dep_with + transfers_in + transfers_out
 
 		return qb.from_(query).select(
+			query.name,
 			query.supplier,
 			fn.Sum(query.deposit).as_('deposit'),
 			fn.Sum(query.deposit_fee).as_('deposit_fee'),
@@ -167,6 +177,7 @@ def get_data(filters):
 		).groupby(query.supplier).run(as_dict=True)
 	else:
 		dep_with = Query.from_(T).select(
+			T.name,
 			T.supplier,
 			T.date,
 			T.transaction_type,
@@ -177,6 +188,7 @@ def get_data(filters):
 		).where(Criterion.all(conditions))
 
 		transfers_in = Query.from_(BT).select(
+			BT.name,
 			BT.to_supplier.as_('supplier'),
 			BT.date,
 			ConstantColumn('Transfer In').as_('transaction_type'),
@@ -187,6 +199,7 @@ def get_data(filters):
 		).where(Criterion.all(trax_in_conditions))
 
 		transfers_out = Query.from_(BT).select(
+			BT.name,
 			BT.from_supplier.as_('supplier'),
 			BT.date,
 			ConstantColumn('Transfer Out').as_('transaction_type'),
@@ -199,6 +212,7 @@ def get_data(filters):
 		query = dep_with + transfers_in + transfers_out
 
 		return qb.from_(query).select(
+			query.name,
 			query.supplier,
 			query.date,
 			query.transaction_type,
