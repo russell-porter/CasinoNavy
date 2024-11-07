@@ -41,8 +41,9 @@
   },
   {
    "fieldname": "supplier",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Supplier",
+   "options": "Supplier",
    "reqd": 1
   },
   {
@@ -113,7 +114,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-29 18:39:28.939717",
+ "modified": "2024-11-07 14:17:35.580326",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Transaction Ledger",

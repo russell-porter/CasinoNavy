@@ -42,10 +42,11 @@
   },
   {
    "fieldname": "from_supplier",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "From Supplier",
+   "options": "Supplier",
    "reqd": 1
   },
   {
@@ -68,10 +69,11 @@
   },
   {
    "fieldname": "to_supplier",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "To Supplier",
+   "options": "Supplier",
    "reqd": 1
   },
   {
@@ -142,7 +144,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-29 18:39:03.471544",
+ "modified": "2024-11-07 14:18:03.448027",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Balance Transfer",
