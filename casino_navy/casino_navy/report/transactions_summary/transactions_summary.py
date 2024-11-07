@@ -130,30 +130,30 @@ def get_data(filters):
 		# Deposits and Withdrawals
 		dep_with = Query.from_(T).select(
 			T.supplier,
-			fn.Sum(Case().when(T.transaction_type == 'Deposit', T.amount).else_(0)).as_('deposit'),
-			fn.Sum(Case().when(T.transaction_type == 'Deposit', T.fee).else_(0)).as_('deposit_fee'),
-			fn.Sum(Case().when(T.transaction_type == 'Withdraw', T.amount).else_(0)).as_('withdraw'),
-			fn.Sum(Case().when(T.transaction_type == 'Withdraw', T.fee).else_(0)).as_('withdraw_fee'),
-			fn.Sum(Case().when(T.transaction_type == 'Deposit', T.amount).else_(-T.amount) ).as_('balance'),
-		).where(Criterion.all(conditions)).groupby(T.supplier).orderby(T.supplier)
+			(Case().when(T.transaction_type == 'Deposit', T.amount).else_(0)).as_('deposit'),
+			(Case().when(T.transaction_type == 'Deposit', T.fee).else_(0)).as_('deposit_fee'),
+			(Case().when(T.transaction_type == 'Withdraw', T.amount).else_(0)).as_('withdraw'),
+			(Case().when(T.transaction_type == 'Withdraw', T.fee).else_(0)).as_('withdraw_fee'),
+			(Case().when(T.transaction_type == 'Deposit', T.amount).else_(-T.amount) ).as_('balance'),
+		).where(Criterion.all(conditions)).orderby(T.supplier)
 		# Transfers In
 		transfers_in = Query.from_(BT).select(
 			BT.to_supplier.as_('supplier'),
-			fn.Sum(BT.amount).as_('deposit'),
-			fn.Sum(BT.to_fee).as_('deposit_fee'),
-			fn.Sum(0).as_('withdraw'),
-			fn.Sum(0).as_('withdraw_fee'),
-			fn.Sum(BT.amount).as_('balance')
-		).where(Criterion.all(trax_in_conditions)).groupby(BT.to_supplier)
+			(BT.amount).as_('deposit'),
+			(BT.to_fee).as_('deposit_fee'),
+			(BT.docstatus).as_('withdraw'),
+			(BT.docstatus).as_('withdraw_fee'),
+			(BT.amount).as_('balance')
+		).where(Criterion.all(trax_in_conditions))
 		# Transfers Out
 		transfers_out = Query.from_(BT).select(
 			BT.from_supplier.as_('supplier'),
-			fn.Sum(0).as_('deposit'),
-			fn.Sum(0).as_('deposit_fee'),
-			fn.Sum(BT.amount).as_('withdraw'),
-			fn.Sum(BT.from_fee).as_('withdraw_fee'),
-			fn.Sum(-BT.amount).as_('balance')
-		).where(Criterion.all(trax_out_conditions)).groupby(BT.from_supplier)
+			(BT.docstatus).as_('deposit'),
+			(BT.docstatus).as_('deposit_fee'),
+			(BT.amount).as_('withdraw'),
+			(BT.from_fee).as_('withdraw_fee'),
+			(-BT.amount).as_('balance')
+		).where(Criterion.all(trax_out_conditions))
 
 		query = dep_with + transfers_in + transfers_out
 
@@ -182,17 +182,17 @@ def get_data(filters):
 			ConstantColumn('Transfer In').as_('transaction_type'),
 			BT.amount.as_('deposit'),
 			BT.to_fee.as_('deposit_fee'),
-			ConstantColumn(0).as_('withdraw'),
-			ConstantColumn(0).as_('withdraw_fee'),
+			BT.docstatus.as_('withdraw'),
+			BT.docstatus.as_('withdraw_fee'),
 		).where(Criterion.all(trax_in_conditions))
 
 		transfers_out = Query.from_(BT).select(
 			BT.from_supplier.as_('supplier'),
 			BT.date,
 			ConstantColumn('Transfer Out').as_('transaction_type'),
-			ConstantColumn(0).as_('deposit'),
-			ConstantColumn(0).as_('deposit_fee'),
-			BT.amount.as_('withdraw'),
+			BT.docstatus.as_('deposit'),
+			BT.docstatus.as_('deposit_fee'),
+			(BT.amount).as_('withdraw'),
 			BT.from_fee.as_('withdraw_fee'),
 		).where(Criterion.all(trax_out_conditions))
 
@@ -207,4 +207,3 @@ def get_data(filters):
 			query.withdraw.as_('withdraw'),
 			query.withdraw_fee.as_('withdraw_fee'),
 		).orderby(query.date).run(as_dict=True)
-	
