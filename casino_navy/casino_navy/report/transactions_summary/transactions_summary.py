@@ -26,30 +26,35 @@ def get_columns(filters):
 				'fieldname': 'deposit',
 				'label': 'Deposit',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 140
 			},
 			{
 				'fieldname': 'deposit_fee',
 				'label': 'Deposit Fee',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 140
 			},
 			{
 				'fieldname': 'withdraw',
 				'label': 'Withdraw',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 140
 			},
 			{
 				'fieldname': 'withdraw_fee',
 				'label': 'Withdrawal Fee',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 140
 			},
 			{
 				'fieldname': 'balance',
 				'label': 'Balance',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 140
 			}
 			
@@ -86,24 +91,28 @@ def get_columns(filters):
 				'fieldname': 'deposit',
 				'label': 'Deposit',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 140
 			},
 			{
 				'fieldname': 'deposit_fee',
 				'label': 'Deposit Fee',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 130
 			},
 			{
 				'fieldname': 'withdraw',
 				'label': 'Withdraw',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 130
 			},
 			{
 				'fieldname': 'withdraw_fee',
 				'label': 'Withdraw Fee',
 				'fieldtype': 'Currency',
+				'precision': 9,
 				'width': 130
 			}
 		]

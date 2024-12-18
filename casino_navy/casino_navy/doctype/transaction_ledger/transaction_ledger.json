@@ -65,13 +65,15 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount",
+   "precision": "9",
    "reqd": 1
   },
   {
    "default": "0",
    "fieldname": "fee",
    "fieldtype": "Currency",
-   "label": "Fee"
+   "label": "Fee",
+   "precision": "9"
   },
   {
    "fieldname": "amended_from",
@@ -114,7 +116,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-07 14:17:35.580326",
+ "modified": "2024-12-18 12:06:19.273195",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Transaction Ledger",
