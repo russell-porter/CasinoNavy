@@ -1,11 +1,9 @@
 frappe.ui.form.on("Data Import", {
     setup(frm){
         frm.trigger('setup_realtime_events');
-        console.log('setup');
     },
     refresh (frm) {
         frm.trigger('add_custom_button');
-        console.log('refresh');
     },
     add_custom_button (frm) {
         if (frm.is_new()) 
