@@ -17,14 +17,6 @@ def delete_all_data_imports(name):
     if doc.reference_doctype not in ("Transaction Ledger", "Balance Transfer"):
         frappe.throw("This option is only available for Transaction Ledger and Balance Transfer")
 
-    REF = qb.DocType(doc.reference_doctype)
-    
-    references = Query.from_(IL).select(
-        IL.docname
-    ).where(
-        (IL.data_import == doc.name)&
-        (IL.success == 1)
-    )
     frappe.publish_realtime(
         "delete_data_import",
         {
@@ -38,13 +30,24 @@ def delete_all_data_imports(name):
     )
 
     # Step 1
-    if references:
-        qb.from_(REF).delete().where(REF.name.isin(references)).run()
+    frappe.db.sql("""
+        DELETE  
+            `tab{0}`
+        FROM  
+            `tab{0}`
+        JOIN 
+            `tabData Import Log` 
+        ON 
+            `tab{0}`.`name`=`tabData Import Log`.`docname` 
+        WHERE 
+            `tabData Import Log`.`data_import`='{1}'
+    """.format(doc.reference_doctype, name))
+    
     
     frappe.publish_realtime("delete_data_import_refresh", {"mapping": doc.name})
 
     # Step 2
-    qb.from_(IL).delete().where(IL.data_import == doc.name).run()
+    qb.from_(IL).delete().where(IL.data_import == doc.name).run(debug=True)
     
     frappe.publish_realtime("delete_data_import_complete", {"mapping": doc.name})
 
