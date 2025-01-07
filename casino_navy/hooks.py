@@ -108,6 +108,23 @@ doctype_js = {
 #	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }
 
+# Fixtures
+# ---------------
+fixtures = [
+	{
+		"doctype": "Custom Field",
+		"filters": {
+			"module": "Casino Navy"
+        }
+    },
+    {
+		"doctype": "Property Setter",
+		"filters": {
+			"module": "Casino Navy"
+        }
+    },
+]
+
 # DocType Class
 # ---------------
 # Override standard doctype classes
