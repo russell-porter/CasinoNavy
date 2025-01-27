@@ -10,16 +10,22 @@
  "field_order": [
   "company",
   "transaction_type",
-  "supplier",
+  "bank",
+  "bank_account",
   "main_cb",
   "date",
   "amount",
   "fee",
+  "fee_type",
+  "fee_account",
   "transaction_sb",
   "transaction_id",
   "third_party_reference",
   "transaction_cb",
+  "charge_type",
+  "charge_account",
   "username",
+  "description_sb",
   "description",
   "amended_from"
  ],
@@ -37,13 +43,6 @@
    "in_standard_filter": 1,
    "label": "Transaction Type",
    "options": "\nDeposit\nWithdraw",
-   "reqd": 1
-  },
-  {
-   "fieldname": "supplier",
-   "fieldtype": "Link",
-   "label": "Supplier",
-   "options": "Supplier",
    "reqd": 1
   },
   {
@@ -73,6 +72,7 @@
    "fieldname": "fee",
    "fieldtype": "Currency",
    "label": "Fee",
+   "non_negative": 1,
    "precision": "9"
   },
   {
@@ -110,13 +110,63 @@
   },
   {
    "fieldname": "description",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text"
+  },
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Account",
+   "read_only": 1
+  },
+  {
+   "fieldname": "charge_type",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Charge Type",
+   "options": "Charge Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description_sb",
+   "fieldtype": "Section Break",
    "label": "Description"
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "label": "Bank",
+   "options": "Bank Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "charge_account",
+   "fieldtype": "Link",
+   "label": "Charge Account",
+   "options": "Account",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:flt(doc.fee) >0",
+   "fieldname": "fee_type",
+   "fieldtype": "Link",
+   "label": "Fee Type",
+   "mandatory_depends_on": "eval: flt(doc.fee) > 0.0",
+   "options": "Charge Type"
+  },
+  {
+   "fieldname": "fee_account",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Fee Account",
+   "options": "Account",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2024-12-18 12:06:19.273195",
+ "modified": "2025-01-27 02:55:11.085783",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Transaction Ledger",
@@ -124,6 +174,8 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -133,9 +185,12 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -145,9 +200,12 @@
    "report": 1,
    "role": "Accounts Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -157,6 +215,7 @@
    "report": 1,
    "role": "Accounts User",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
@@ -164,5 +223,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "supplier"
+ "title_field": "bank_account"
 }

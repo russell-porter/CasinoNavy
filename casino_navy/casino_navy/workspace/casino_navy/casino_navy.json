@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"bOmK0dsYtI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Casino Navy</span>\",\"col\":12}},{\"id\":\"FJExpYrUWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":3}},{\"id\":\"mo8j1l8fpJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transaction Ledger\",\"col\":3}},{\"id\":\"Dldfdr88qz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Balance Transfer\",\"col\":3}},{\"id\":\"z2Wi9wRtg2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"xU0Z8P7HEf\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "content": "[{\"id\":\"bOmK0dsYtI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Casino Navy</span>\",\"col\":12}},{\"id\":\"lk2aclB072\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Bank Account\",\"col\":3}},{\"id\":\"vafYwRWDPu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Charge Type\",\"col\":3}},{\"id\":\"mo8j1l8fpJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transaction Ledger\",\"col\":3}},{\"id\":\"Dldfdr88qz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Balance Transfer\",\"col\":3}},{\"id\":\"z2Wi9wRtg2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"xU0Z8P7HEf\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
  "creation": "2024-09-12 01:05:30.739849",
  "custom_blocks": [],
  "docstatus": 0,
@@ -31,8 +31,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-09 12:53:19.303443",
- "modified_by": "lewinvillar@tzcode.tech",
+ "modified": "2025-01-27 03:01:57.585196",
+ "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Casino Navy",
  "number_cards": [],
@@ -46,18 +46,25 @@
   {
    "color": "Grey",
    "doc_view": "List",
+   "label": "Bank Account",
+   "link_to": "Bank Account",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
    "label": "Balance Transfer",
    "link_to": "Balance Transfer",
    "stats_filter": "[]",
    "type": "DocType"
   },
   {
-   "color": "Green",
+   "color": "Grey",
    "doc_view": "List",
-   "format": "{} Active",
-   "label": "Supplier",
-   "link_to": "Supplier",
-   "stats_filter": "[[\"Supplier\",\"disabled\",\"=\",0,false]]",
+   "label": "Charge Type",
+   "link_to": "Charge Type",
+   "stats_filter": "[]",
    "type": "DocType"
   },
   {
