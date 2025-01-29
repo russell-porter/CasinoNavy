@@ -25,12 +25,14 @@ class TransactionLedger(Document):
 	def make_entry(self):
 		jv = frappe.new_doc("Journal Entry")
 		jv.update({
+			"company": self.company,
 			"voucher_type": "Bank Entry",
 			"posting_date": self.date,
 			"cheque_no": f"Transaction Ledeger {self.name}",
 			"reference_type": self.doctype,
 			"reference_name": self.name,
 			"cheque_date": self.date,
+			"multi_currency": 1,
 		})
 
 		company = frappe.get_doc("Company", self.company)
