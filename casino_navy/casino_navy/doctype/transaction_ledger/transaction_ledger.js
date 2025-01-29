@@ -48,8 +48,10 @@ frappe.ui.form.on('Transaction Ledger', {
 			const {doctype, name} = frm.doc;
 			const args = {doctype, name};
 			frappe.call(method, args).then(({ message }) => {
-				if (!message)
+				if (!message){
+					frappe.msgprint("No records found!!")
 					return;
+				}	
 				frappe.route_options = {
 					"company": frm.doc.company,
 					"from_date": frm.doc.date,
