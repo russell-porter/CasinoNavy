@@ -31,7 +31,6 @@ frappe.query_reports["Bank Clearance"] = {
 			"label": __("Bank Account"),
 			"fieldtype": "Link",
 			"options": "Bank Account",
-			"reqd": 1,
 			"get_query": function() {
 				return {
 					"query": "casino_navy.casino_navy.report.bank_clearance.bank_clearance.get_account_list",
@@ -41,6 +40,12 @@ frappe.query_reports["Bank Clearance"] = {
 				}
 			}
 		},
+		{
+			"fieldname":"summary",
+			"label": __("Summary"),
+			"fieldtype": "Check",
+			"default": 1,
+		}
 	]
 }
 

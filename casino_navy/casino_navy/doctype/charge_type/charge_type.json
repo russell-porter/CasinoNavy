@@ -36,6 +36,7 @@
   {
    "fieldname": "type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Type",
    "options": "\nIncome\nExpense\nFee",
    "reqd": 1
@@ -43,7 +44,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-29 02:46:23.459466",
+ "modified": "2025-04-25 12:26:12.299435",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Charge Type",

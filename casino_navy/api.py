@@ -1,108 +1,121 @@
 import frappe
 from frappe.utils import today
 from datetime import datetime
-from casino_navy.casino_navy.report.transactions_summary.transactions_summary import get_data
 from frappe.exceptions import ValidationError
+from erpnext.accounts.utils import get_balance_on
+from erpnext.setup.utils import get_exchange_rate
+import json
 
-
-@frappe.whitelist()
-def get_balance(company, supplier, date=None):
-    """
-    Get the balance for a specific supplier for a given company up to a specified date.
-
-    :param company: Name of the company.
-    :param supplier: Name of the supplier.
-    :param date: Optional. The date up to which the balance is calculated. Defaults to today's date.
-    :return: Balance data retrieved from the transactions summary.
-    :raises ValidationError: If any of the input parameters are invalid.
-    :raises frappe.DoesNotExistError: If the company or supplier does not exist in the system.
-    """
-    # Validate input parameters
-    if not company or not supplier:
-        raise ValidationError("Both 'company' and 'supplier' parameters are required.")
-    
+def parse_date(date_str):
     try:
-        # Validate date if provided
-        if date:
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-        else:
-            date = today()
+        if date_str:
+            return datetime.strptime(date_str, "%Y-%m-%d").date()
+        return today()
     except ValueError:
         raise ValidationError("Invalid date format. Please provide a valid date (YYYY-MM-DD).")
 
-    # Check if the company and supplier exist
-    if not frappe.db.exists("Company", company):
-        raise frappe.DoesNotExistError(f"Company '{company}' does not exist.")
-    if not frappe.db.exists("Supplier", supplier):
-        raise frappe.DoesNotExistError(f"Supplier '{supplier}' does not exist.")
-    
-    # Prepare filters for the report
-    filters = {
-        "company": company,
-        "supplier": supplier,
-        "from_date": "2020-01-01",
-        "to_date": date,
-        "summary": 1
-    }
-    
+@frappe.whitelist()
+def get_balance(company, bank, date=None, cost_center=None, in_account_currency=True):
+    """
+    Fetches the balance of a specific bank account for a given company and date.
+    """
+    if not company or not bank:
+        raise ValidationError("Both 'company' and 'bank' parameters are required.")
+
     try:
-        # Retrieve the balance data
-        balance_data = get_data(filters)
+        date = parse_date(date)
+        
+        if not frappe.db.exists("Company", company):
+            raise frappe.DoesNotExistError(f"Company '{company}' does not exist.")
+        if not frappe.db.exists("Bank Account", bank):
+            raise frappe.DoesNotExistError(f"Bank Account '{bank}' does not exist.")
+        
+        company_doc = frappe.get_doc("Company", company)
+        company_currency = company_doc.default_currency
+        bank_data = get_bank_account_details(bank)
+
+        exchange_rate = 1
+        if company_currency != bank_data.account_currency:
+            exchange_rate = get_exchange_rate(
+                bank_data.account_currency,
+                company_currency,
+                date,
+                "for_selling"
+            )
+
+        balance = get_balance_on(
+            account=bank_data.bank_account,
+            date=date,
+            company=company_doc.name,
+            in_account_currency=in_account_currency,
+            cost_center=cost_center,
+            ignore_account_permission=True
+        )
+        return balance
+
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error in get_balance API")
-        raise Exception from e
-
-    return balance_data
-
-
+        frappe.log_error(title="Error in get_balance API", message=f"{str(e)}\n{frappe.get_traceback()}")
+        raise
 
 @frappe.whitelist()
 def add_transaction(data):
     """
     Add a new transaction to the Transaction Ledger.
-
-    :param data: JSON string containing transaction details.
-    :return: Success message or validation errors.
     """
     try:
-        # Parse the input data
-        transaction_data = frappe.parse_json(data)
+        try:
+            transaction_data = frappe.parse_json(data)
+        except Exception:
+            raise ValidationError("Invalid JSON provided in data.")
 
-        # Define the required fields
-        required_fields = ["company", "transaction_type", "supplier", "date", "amount", "fee"]
-
-        # Check if required fields are provided
+        required_fields = ["company", "transaction_type", "bank", "date", "amount", "charge_type"]
         missing_fields = [field for field in required_fields if not transaction_data.get(field)]
+        
         if missing_fields:
             frappe.throw(f"Missing required fields: {', '.join(missing_fields)}")
-        
-        date  = transaction_data["date"]
-        
-        if date:
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-        else:
-            date = today()
 
-        # Prepare the document for insertion
+        if transaction_data.get("fee") and not transaction_data.get("fee_type"):
+            frappe.throw("Field 'fee_type' is required when 'fee' is provided.")
+
+        date = parse_date(transaction_data.get("date"))
+
         transaction = frappe.get_doc({
             "doctype": "Transaction Ledger",
-            "company": transaction_data["company"],
-            "transaction_type": transaction_data["transaction_type"],
-            "supplier": transaction_data["supplier"],
+            "company": transaction_data.get("company"),
+            "transaction_type": transaction_data.get("transaction_type"),
+            "bank": transaction_data.get("bank"),
             "date": date,
-            "amount": transaction_data["amount"],
-            "fee": transaction_data["fee"],
-            "transaction_id": transaction_data.get("transaction_id"),  # Optional
-            "third_party_reference": transaction_data.get("third_party_reference"),  # Optional
-            "username": transaction_data.get("username"),  # Optional
-            "description": transaction_data.get("description")  # Optional
+            "amount": transaction_data.get("amount"),
+            "fee": transaction_data.get("fee"),
+            "fee_type": transaction_data.get("fee_type"),
+            "charge_type": transaction_data.get("charge_type"),
+            "transaction_id": transaction_data.get("transaction_id"),
+            "third_party_reference": transaction_data.get("third_party_reference"),
+            "username": transaction_data.get("username"),
+            "description": transaction_data.get("description")
         })
 
-        # Insert the document into the database
         transaction.save()
+        transaction.submit()
 
         return {"status": "success", "message": "Transaction added successfully", "transaction": transaction.as_dict()}
 
     except Exception as e:
-        frappe.log_error("Add Transaction Ledger API Error", frappe.get_traceback())
+        frappe.log_error(title="Error in add_transaction API", message=f"{str(e)}\n{frappe.get_traceback()}")
         return {"status": "error", "message": str(e)}
+
+def get_bank_account_details(bank):
+    BA = frappe.qb.DocType("Bank Account")
+    A = frappe.qb.DocType("Account")
+    result = (
+        frappe.qb.from_(BA)
+        .join(A).on(BA.account == A.name)
+        .select(A.name.as_("bank_account"), A.account_currency)
+        .where(BA.name == bank)
+        .run(as_dict=True)
+    )
+
+    if not result:
+        frappe.throw(f"Bank Account '{bank}' does not have an associated Account.")
+
+    return result[0]

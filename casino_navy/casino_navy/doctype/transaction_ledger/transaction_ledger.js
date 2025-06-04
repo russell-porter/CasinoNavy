@@ -65,7 +65,32 @@ frappe.ui.form.on('Transaction Ledger', {
 			});
 		});
 	},
-	transaction_type(frm) {
-		frm.set_value("charge_type", "");
+	company(frm){
+		frm.trigger("set_custom_labels");
+	},
+	bank(frm) {
+		frm.trigger("fetch_accounts");
+		frm.trigger("set_custom_labels");
+	},
+	charge_type(frm) {
+		frm.trigger("fetch_accounts");
+	},
+	fee_type(frm) {
+		frm.trigger("fetch_accounts");
+	},
+	fetch_accounts(frm) {
+		frm.call("fetch_accounts");
+	},
+	set_custom_labels(frm) {
+		if (frm.doc.company_currency)
+			frm.set_df_property("company", "label", `Company (${frm.doc.company_currency})`);
+		else
+			frm.set_df_property("company", "label", "Company");
+
+		if (frm.doc.bank_currency != frm.doc.company_currency)
+			frm.set_df_property("exchange_rate", "description", `1 ${frm.doc.company_currency} = ${frm.doc.exchange_rate} ${frm.doc.bank_currency}`);
+		else
+			frm.set_df_property("exchange_rate", "description", "");
+	
 	},
 });

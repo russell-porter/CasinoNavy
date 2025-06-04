@@ -4,34 +4,16 @@
 import frappe
 from frappe.utils import flt
 from frappe.model.document import Document
+from casino_navy.utils import get_exchange_rate
 
 class BalanceTransfer(Document):
+
     def validate(self):
-        self.fetch_accounts()
+        self.fetch_accounts_and_rates()
         self.validate_bank_account()
 
     def on_submit(self):
-        from_data = frappe._dict({
-            "company": self.from_company,
-            "bank": self.from_bank,
-            "fee_type": self.from_fee_type,
-            "fee": self.from_fee,
-            "amount": self.amount,
-            "charge_type": self.from_charge_type,
-            "transaction_type": "Withdraw",
-        })
-        to_data = frappe._dict({
-            "company": self.to_company,
-            "bank": self.to_bank,
-            "fee_type": self.to_fee_type,
-            "fee": self.to_fee,
-            "amount": self.amount,
-            "charge_type": self.to_charge_type,
-            "transaction_type": "Deposit",
-        })
-
-        self.make_entry(from_data)
-        self.make_entry(to_data)
+        self.make_entries()
 
     def on_cancel(self):
         self.cancel_entry()
@@ -39,79 +21,112 @@ class BalanceTransfer(Document):
     def on_trash(self):
         self.delete_entry()
 
-    def make_entry(self, data):
+    def make_entries(self):
         """"
             We need to make two entries from and to the bank accounts
         """
-        jv = frappe.new_doc("Journal Entry")
-        jv.update({
+        success = False
+        from_jv = frappe.new_doc("Journal Entry")
+        to_jv = frappe.new_doc("Journal Entry")
+        defaults = {
             "voucher_type": "Bank Entry",
             "posting_date": self.date,
-            "cheque_no": f"Transaction Ledeger {self.name}",
             "reference_type": self.doctype,
             "reference_name": self.name,
             "cheque_date": self.date,
+            "multi_currency": 1,
+        }
+
+        from_jv.update(defaults)
+        from_jv.update({
+            "company": self.from_company,
+            "cheque_no": f"Balance Transfer Out {self.name}",
+        })
+        to_jv.update(defaults)
+        to_jv.update({
+            "company": self.to_company,
+            "cheque_no": f"Balance Transfer In {self.name}",
+        })
+        # Source of funds
+        amount = abs(flt(self.amount)) + abs(flt(self.from_fee))
+        base_amount = amount * self.from_bank_exchange_rate
+        from_company = frappe.get_doc("Company", self.from_company)
+        
+        row = from_jv.append("accounts", {
+            "account": self.from_bank_account,
+            "account_currency": self.from_bank_currency,
+            "exchange_rate": self.from_bank_exchange_rate,
+            "credit_in_account_currency": amount,
+            "credit": amount * self.from_bank_exchange_rate,
+            "bank_account": self.from_bank,
+            "cost_center": from_company.cost_center,
+        })
+        
+        if self.from_fee:
+            from_jv.append("accounts", {
+                "account": self.from_fee_account,
+                "account_currency": self.from_fee_currency,
+                "exchange_rate": self.from_fee_exchange_rate,
+                "debit_in_account_currency": self.from_fee * self.from_fee_exchange_rate,
+                "debit": self.from_fee * self.from_fee_exchange_rate,
+                "cost_center": from_company.cost_center,
+            })
+        
+        from_jv.append("accounts", {
+            "account": self.from_charge_account,
+            "account_currency": self.from_charge_currency,
+            "exchange_rate": self.from_charge_exchange_rate,
+            "debit_in_account_currency": base_amount * self.from_charge_exchange_rate,
+            "debit": base_amount,
+            "cost_center": from_company.cost_center,
+        })
+        # Destination of funds
+        amount = abs(flt(self.amount)) - abs(flt(self.to_fee))
+        to_company = frappe.get_doc("Company", self.to_company)
+
+        row = to_jv.append("accounts", {
+            "account": self.to_bank_account,
+            "account_currency": self.to_bank_currency,
+            "exchange_rate": self.to_bank_exchange_rate,
+            "debit_in_account_currency": amount,
+            "debit": amount * self.to_bank_exchange_rate,
+            "bank_account": self.to_bank,
+            "cost_center": to_company.cost_center,
         })
 
-        company = frappe.get_doc("Company", data.company)
-
-        default_income_account = company.default_income_account
-        default_cost_center = company.cost_center
-
-        if not default_income_account:
-            frappe.throw(f"Please set a default income account for the company {data.company}")
-
-        # Amount
-        if data.transaction_type == "Deposit":
-            amount = abs(flt(data.amount)) - abs(flt(data.fee))
-            jv.append("accounts", {
-                "account": get_bank_account(data.bank),
-                "debit_in_account_currency": amount,
-                "debit": amount,
-                "bank_account": data.bank,
-                "cost_center": default_cost_center,
+        if self.to_fee:
+            row = to_jv.append("accounts", {
+                "account": self.to_fee_account,
+                "account_currency": self.to_fee_currency,
+                "exchange_rate": self.to_fee_exchange_rate,
+                "debit_in_account_currency": self.to_fee * self.to_fee_exchange_rate,
+                "debit": self.to_fee * self.to_fee_exchange_rate,
+                "cost_center": to_company.cost_center,
             })
 
-            if data.fee:
-                jv.append("accounts", {
-                    "account": get_charge_account(data.company, data.fee_type),
-                    "debit_in_account_currency": data.fee,
-                    "debit": data.fee,
-                    "cost_center": default_cost_center,
-                })
+        row = to_jv.append("accounts", {
+            "account": self.to_charge_account,
+            "account_currency": self.to_charge_currency,
+            "exchange_rate": self.to_charge_exchange_rate,
+            "credit_in_account_currency": base_amount * self.to_charge_exchange_rate,
+            "credit": base_amount,
+            "cost_center": to_company.cost_center,
+        })
 
-            jv.append("accounts", {
-                "account": get_charge_account(data.company, data.charge_type),
-                "credit_in_account_currency": data.amount,
-                "credit": data.amount,
-                "cost_center": default_cost_center,
-            })
-        elif data.transaction_type == "Withdraw":
-            amount = abs(flt(data.amount)) + abs(flt(data.fee))
-            jv.append("accounts", {
-                "account": get_bank_account(data.bank),
-                "credit_in_account_currency": amount,
-                "credit": amount,
-                "bank_account": data.bank,
-                "cost_center": default_cost_center,
-            })
-            if data.fee:
-                jv.append("accounts", {
-                    "account": get_charge_account(data.company, data.fee_type),
-                    "debit_in_account_currency": data.fee,
-                    "debit": data.fee,
-                    "cost_center": default_cost_center,
-                })
-            jv.append("accounts", {
-                "account": get_charge_account(data.company, data.charge_type),
-                "debit_in_account_currency": data.amount,
-                "debit": data.amount,
-                "cost_center": default_cost_center,
-            })
+        try:
+            from_jv.save()
+            from_jv.submit()
+            to_jv.save()
+            to_jv.submit()
 
-        jv.save()
-        jv.submit()
-        return jv.name
+            success = True
+        except Exception as e:
+            content = f" From Journal Entry: {from_jv.as_json()}\n\n{str(e)}\n\n{frappe.get_traceback()}"
+            content += f" To Journal Entry: {to_jv.as_json()}"
+            frappe.log_error("Balance Transfer Error", content)    
+            
+        if not success:
+            frappe.throw(f"An error occurred while creating the journal entry for this transaction check the logs for more details")
 
     def cancel_entry(self):
         filters = {
@@ -133,30 +148,119 @@ class BalanceTransfer(Document):
             jv = frappe.get_doc("Journal Entry", name)
             jv.delete()
 
-    def fetch_accounts(self):
-        self.from_bank_account = get_bank_account(self.from_bank)
-        self.to_bank_account = get_bank_account(self.to_bank)
-        self.from_fee_account = get_charge_account(self.from_company, self.from_fee_type)
-        self.to_fee_account = get_charge_account(self.to_company, self.to_fee_type)
+    def fetch_accounts_and_rates(self):
+        from_company_currency = frappe.get_value("Company", self.from_company, "default_currency")
+        to_company_currency = frappe.get_value("Company", self.to_company, "default_currency")
+        
+        from_bank_details = self.get_bank_account_details(self.from_bank)
+        self.from_bank_account = from_bank_details.bank_account
+        self.from_bank_currency = from_bank_details.account_currency
+        self.from_bank_exchange_rate = get_exchange_rate(
+            self.from_bank_currency,
+            from_company_currency,
+            self.date,
+        )
+
+        to_bank_details = self.get_bank_account_details(self.to_bank)
+        self.to_bank_account = to_bank_details.bank_account
+        self.to_bank_currency = to_bank_details.account_currency
+        self.to_bank_exchange_rate = get_exchange_rate(
+            self.to_bank_currency,
+            to_company_currency,
+            self.date,
+        )
+
+        from_charge_details = get_charge_account_details(self.from_company, self.from_charge_type)
+        self.from_charge_account = from_charge_details.default_account
+        self.from_charge_currency = from_charge_details.account_currency
+        self.from_charge_exchange_rate = get_exchange_rate(
+            self.from_charge_currency,
+            from_company_currency,
+            self.date,
+        )
+        
+        if self.from_fee_type:
+            from_fee_details = get_charge_account_details(self.from_company, self.from_fee_type)
+            self.from_fee_account = from_fee_details.default_account
+            self.from_fee_currency = from_fee_details.account_currency
+            self.from_fee_exchange_rate = get_exchange_rate(
+                self.from_fee_currency,
+                from_company_currency,
+                self.date,
+            )
+        
+        if self.to_fee_type:
+            to_fee_details = get_charge_account_details(self.to_company, self.to_fee_type)
+            self.to_fee_account = to_fee_details.default_account
+            self.to_fee_currency = to_fee_details.account_currency
+            self.to_fee_exchange_rate = get_exchange_rate(
+                self.to_fee_currency,
+                to_company_currency,
+                self.date,
+            )
+
+        to_charge_details = get_charge_account_details(self.to_company, self.to_charge_type)
+        self.to_charge_account = to_charge_details.default_account
+        self.to_charge_currency = to_charge_details.account_currency
+        self.to_charge_exchange_rate = get_exchange_rate(
+            self.to_charge_currency,
+            to_company_currency,
+            self.date,
+        )
+
+
+    def get_bank_account_details(self, bank=None):
+        BA = frappe.qb.DocType("Bank Account")
+        A = frappe.qb.DocType("Account")
+        result = frappe.qb.from_(BA).join(A).on(
+            BA.account == A.name
+        ).select(
+            A.name.as_("bank_account"),
+            A.account_currency
+        ).where(
+            (BA.name == bank if bank else self.bank)
+        ).run(as_dict=True)
+        
+        if not result:
+            frappe.throw(f"Bank Account '{self.bank}' does not have an account")
+        
+        return result[0]
 
     def validate_bank_account(self):
-        pass
+        # let's make sure the fee and the bank account currency are the same
+        if self.from_fee and self.from_fee > 0:
+            if self.from_fee_currency != self.from_bank_currency:
+                frappe.throw(f"Fee currency '{self.from_fee_currency}' does not match bank account currency '{self.from_bank_currency}'")
+        if self.to_fee and self.to_fee > 0:
+            if self.to_fee_currency != self.to_bank_currency:
+                frappe.throw(f"Fee currency '{self.to_fee_currency}' does not match bank account currency '{self.to_bank_currency}'")
 
 def get_bank_account(bank):
     bank_account = frappe.get_value("Bank Account", bank, "account")
     if not bank_account:
         frappe.throw(f"Bank Account '{bank}' does not have an account")
     return bank_account
+    
 
-def get_charge_account(company, charge_type):
+@frappe.whitelist()
+def get_charge_account_details(company, charge_type):
     MOPA = frappe.qb.DocType("Mode of Payment Account")
     CT = frappe.qb.DocType("Charge Type")
+    A = frappe.qb.DocType("Account")
 
     result  = frappe.qb.from_(MOPA).join(CT).on(
         MOPA.parent == CT.name
-    ).select(MOPA.default_account).where(
+    ).join(A).on(
+        MOPA.default_account == A.name
+    ).select(
+        MOPA.default_account,
+        A.account_currency
+    ).where(
         (MOPA.company == company)&
         (CT.name == charge_type)
-    ).run()
+    ).run(as_dict=True)
 
-    return result[0][0] if result else None
+    if not result:
+        frappe.throw(f"Charge Type '{charge_type}' does not have a default account for company '{company}'")
+    
+    return result[0]

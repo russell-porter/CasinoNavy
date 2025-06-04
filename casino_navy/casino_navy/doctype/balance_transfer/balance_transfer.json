@@ -12,20 +12,32 @@
   "from_company",
   "from_bank",
   "from_bank_account",
+  "from_bank_currency",
+  "from_bank_exchange_rate",
   "from_fee",
   "from_fee_type",
   "from_fee_account",
+  "from_fee_currency",
+  "from_fee_exchange_rate",
   "from_charge_type",
   "from_charge_type_account",
+  "from_charge_currency",
+  "from_charge_exchange_rate",
   "main_cb",
   "to_company",
   "to_bank",
   "to_bank_account",
+  "to_bank_currency",
+  "to_bank_exchange_rate",
   "to_fee",
   "to_fee_type",
   "to_fee_account",
+  "to_fee_currency",
+  "to_fee_exchange_rate",
   "to_charge_type",
   "to_charge_type_account",
+  "to_charge_currency",
+  "to_charge_exchange_rate",
   "transaction_sb",
   "amount",
   "transaction_id",
@@ -183,7 +195,7 @@
    "fieldname": "to_fee_type",
    "fieldtype": "Link",
    "label": "To Fee Type",
-   "mandatory_depends_on": "eval:flt(doc.from_fee) > 0",
+   "mandatory_depends_on": "eval:flt(doc.to_fee) > 0",
    "options": "Charge Type"
   },
   {
@@ -227,12 +239,96 @@
    "mandatory_depends_on": "eval:flt(doc.to_fee) > 0",
    "options": "Account",
    "read_only": 1
+  },
+  {
+   "fieldname": "from_bank_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "From Bank Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "from_bank_exchange_rate",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "From Bank Exchange Rate"
+  },
+  {
+   "fieldname": "from_fee_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "From Fee Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "from_fee_exchange_rate",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "From Fee Exchange Rate"
+  },
+  {
+   "fieldname": "from_charge_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "From Charge Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "from_charge_exchange_rate",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "From Charge Exchange Rate"
+  },
+  {
+   "fieldname": "to_bank_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "To Bank Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "to_bank_exchange_rate",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "To Bank Exchange Rate"
+  },
+  {
+   "fieldname": "to_fee_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "To Fee Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "to_fee_exchange_rate",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "To Fee Exchange Rate"
+  },
+  {
+   "fieldname": "to_charge_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "To Charge Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "to_charge_exchange_rate",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "To Charge Exchange Rate"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-29 02:43:25.785400",
+ "modified": "2025-03-18 10:56:27.418361",
  "modified_by": "Administrator",
  "module": "Casino Navy",
  "name": "Balance Transfer",
