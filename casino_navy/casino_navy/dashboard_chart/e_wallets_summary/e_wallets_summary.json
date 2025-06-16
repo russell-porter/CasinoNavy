@@ -1,0 +1,36 @@
+{
+ "chart_name": "E-Wallets Summary",
+ "chart_type": "Report",
+ "creation": "2025-06-04 10:20:56.093105",
+ "custom_options": "[\n\"#5e64ff\", \"#ff5858\", \"#7cd6fd\", \"#ffa3ef\", \"#ffcd56\", \"#5bc0de\", \"#4caf50\", \"#e91e63\",\"#9c27b0\", \"#03a9f4\", \"#009688\", \"#cddc39\", \"#ffc107\", \"#ff5722\"\n]",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "dynamic_filters_json": "{\"from_date\":\"frappe.datetime.month_start()\",\"to_date\":\"frappe.datetime.month_end()\",\"summary\":\"1\"}",
+ "filters_json": "{\"company\":\"X2 - JMS Investment Group N.V\",\"presentation_currency\":\"TRY\"}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2025-06-04 10:22:05.735853",
+ "modified_by": "engin@casinonavy.com",
+ "module": "Casino Navy",
+ "name": "E-Wallets Summary",
+ "number_of_groups": 0,
+ "owner": "engin@casinonavy.com",
+ "report_name": "E-Wallet Summary",
+ "roles": [
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Accounts User"
+  }
+ ],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 1,
+ "x_field": "",
+ "y_axis": []
+}

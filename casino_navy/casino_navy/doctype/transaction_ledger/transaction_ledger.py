@@ -27,7 +27,7 @@ class TransactionLedger(Document):
 			"company": self.company,
 			"voucher_type": "Bank Entry",
 			"posting_date": self.date,
-			"cheque_no": f"Transaction Ledeger {self.name}",
+			"cheque_no": f"Transaction Ledger {self.name}",
 			"reference_type": self.doctype,
 			"reference_name": self.name,
 			"cheque_date": self.date,
@@ -44,9 +44,17 @@ class TransactionLedger(Document):
 			default_currency,
 			self.date,
 		)
-		
+		if not self.fee:
+			self.fee = 0.00
+
 		charge_exchange_rate = get_exchange_rate(
 			self.charge_currency,
+			default_currency,
+			self.date,
+		)
+
+		fee_exchange_rate = get_exchange_rate(
+			self.fee_currency,
 			default_currency,
 			self.date,
 		)
@@ -54,7 +62,7 @@ class TransactionLedger(Document):
 		# Amount
 		if self.transaction_type == "Deposit":
 			amount = abs(flt(self.amount, 6)) 
-			base_amount = amount * bank_exchange_rate
+			base_amount = flt(self.amount * bank_exchange_rate, 6)
 			fee_amount = abs(flt(self.fee, 6))
 			base_fee_amount = .00
 			
@@ -62,20 +70,15 @@ class TransactionLedger(Document):
 				"account": bank_details.bank_account,
 				"account_currency": bank_details.account_currency,
 				"exchange_rate": bank_exchange_rate,
-				"debit_in_account_currency": amount,
-				"debit": base_amount,				
+				"debit_in_account_currency": flt(self.amount - self.fee, 6),
+				"debit": flt( (self.amount * bank_exchange_rate)  - (self.fee * fee_exchange_rate), 6),				
 				"bank_account": self.bank,
 				"cost_center": default_cost_center,
 			})
 			
 			if self.fee:
 	
-				fee_exchange_rate = get_exchange_rate(
-					self.fee_currency,
-					default_currency,
-					self.date,
-				)
-				base_fee_amount = flt(fee_amount) * flt(fee_exchange_rate)
+				base_fee_amount = flt(self.fee * fee_exchange_rate, 6)
 				row = jv.append("accounts", {
 					"account": self.fee_account,
 					"account_currency": self.fee_currency,
@@ -89,13 +92,13 @@ class TransactionLedger(Document):
 				"account": self.charge_account,
 				"account_currency": self.charge_currency,
 				"exchange_rate": charge_exchange_rate,
-				"credit_in_account_currency": (amount + fee_amount),
-				"credit": base_amount + base_fee_amount,
+				"credit_in_account_currency": amount,
+				"credit": base_amount,
 				"cost_center": default_cost_center,
 			})	
 		elif self.transaction_type == "Withdraw":
 			amount = abs(flt(self.amount, 6)) 
-			base_amount = amount * bank_exchange_rate
+			base_amount = flt(self.amount * bank_exchange_rate, 6)
 			fee_amount = abs(flt(self.fee, 6))
 			base_fee_amount = .00
 			
@@ -103,25 +106,20 @@ class TransactionLedger(Document):
 				"account": bank_details.bank_account,
 				"account_currency": bank_details.account_currency,
 				"exchange_rate": bank_exchange_rate,
-				"credit_in_account_currency": amount,
-				"credit": base_amount,				
+				"credit_in_account_currency": flt(self.amount + self.fee, 6),
+				"credit": flt( (self.amount * bank_exchange_rate)  + (self.fee * fee_exchange_rate), 6),				
 				"bank_account": self.bank,
 				"cost_center": default_cost_center,
 			})
 
 			if self.fee:
-				fee_exchange_rate = get_exchange_rate(
-					self.fee_currency,
-					default_currency,
-					self.date,
-				)
-				base_fee_amount = fee_amount * fee_exchange_rate
+				base_fee_amount = flt(self.fee * fee_exchange_rate, 6)
 				row = jv.append("accounts", {
 					"account": self.fee_account,
 					"account_currency": self.fee_currency,
 					"exchange_rate": fee_exchange_rate,
-					"credit_in_account_currency": fee_amount,
-					"credit": base_fee_amount,
+					"debit_in_account_currency": fee_amount,
+					"debit": base_fee_amount,
 					"cost_center": default_cost_center,
 				})
 
@@ -129,12 +127,33 @@ class TransactionLedger(Document):
 				"account": self.charge_account,
 				"account_currency": self.charge_currency,
 				"exchange_rate": charge_exchange_rate,
-				"debit_in_account_currency": (amount + fee_amount),
-				"debit": base_amount + base_fee_amount,
+				"debit_in_account_currency": amount,
+				"debit": base_amount,
 				"cost_center": default_cost_center,
 			})
 			
 		try: 
+			jv.set_total_debit_credit()
+			for account in jv.accounts:
+				print(f"{account.account}\t\t\t\t{account.debit}({account.debit_in_account_currency})\t\t\t\t{account.credit} ({account.credit_in_account_currency})")
+			print(f"Total Debit: \t\t\t\t{jv.total_debit}\t\t\t\tTotal Credit: {jv.total_credit}")
+			
+			if jv.difference:
+				exchange_account = frappe.get_cached_value(
+					"Company", 
+					self.company, 
+					"exchange_gain_loss_account"
+				)
+				if not exchange_account:
+					frappe.throw(f"Company '{self.company}' does not have an Exchange Gain/Loss Account set")
+				jv.append("accounts", {
+					"account": exchange_account,
+					"account_currency": default_currency,
+					"exchange_rate": 1.0,
+					"debit_in_account_currency": jv.difference * -1,
+					"debit": jv.difference * -1,
+					"cost_center": default_cost_center,
+				})
 			jv.save()
 			jv.submit()
 			return jv.name

@@ -11,7 +11,6 @@ def get_exchange_rate(from_currency, to_currency, date=None, conversion_type="fo
     if not frappe.db.exists("Currency", to_currency):
         frappe.throw(f"Currency {to_currency} not found")
     exchange = get_conversion_rate(from_currency, to_currency, date, conversion_type)
-    print(f"Exchange rate between {from_currency} and {to_currency} on {date}: {exchange}")
     return exchange
 
 

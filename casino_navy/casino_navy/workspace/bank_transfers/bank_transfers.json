@@ -1,0 +1,90 @@
+{
+ "charts": [
+  {
+   "chart_name": "E-Wallets Summary",
+   "label": "E-Wallets Summary"
+  }
+ ],
+ "content": "[{\"id\":\"bOmK0dsYtI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Casino Navy</span>\",\"col\":12}},{\"id\":\"kKRlDLclfN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total in Wallets\",\"col\":4}},{\"id\":\"9Yja7eAhdQ\",\"type\":\"chart\",\"data\":{\"chart_name\":\"E-Wallets Summary\",\"col\":12}},{\"id\":\"4Ck3kLvsGZ\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"lk2aclB072\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Bank Account\",\"col\":3}},{\"id\":\"vafYwRWDPu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Charge Type\",\"col\":3}},{\"id\":\"mo8j1l8fpJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transaction Ledger\",\"col\":3}},{\"id\":\"Dldfdr88qz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Balance Transfer\",\"col\":3}},{\"id\":\"z2Wi9wRtg2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"xU0Z8P7HEf\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "creation": "2024-09-12 01:05:30.739849",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "money-coins-1",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Bank Transfers",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 1,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Bank Clearance",
+   "link_count": 0,
+   "link_to": "Bank Clearance",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-06-11 14:09:03.805755",
+ "modified_by": "engin@casinonavy.com",
+ "module": "Casino Navy",
+ "name": "Bank Transfers",
+ "number_cards": [
+  {
+   "label": "Total in Wallets",
+   "number_card_name": "E-Wallets Summary"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 2.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Bank Account",
+   "link_to": "Bank Account",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Balance Transfer",
+   "link_to": "Balance Transfer",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Charge Type",
+   "link_to": "Charge Type",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Transaction Ledger",
+   "link_to": "Transaction Ledger",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Bank Transfers"
+}
